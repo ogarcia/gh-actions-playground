@@ -1,0 +1,22 @@
+name: Build on Alpine
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Builds on Alpine Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Build application in Alpine Linux container
+        run: |
+          docker run --rm -v $(pwd):/app -w /app rust:alpine sh -c "
+            apk add -U --no-progress --no-cache musl-dev openssl-dev openssl-libs-static
+            cargo build --release
+          "
+      - name: Upload release binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: it
+          path: target/release/it
