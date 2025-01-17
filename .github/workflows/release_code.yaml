@@ -1,0 +1,23 @@
+name: Release code
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Release the code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
+        uses: actions/checkout@v2
+      - name: Package code
+        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
+        run: |
+          install -dm755 "it-code"
+          cp -a Cargo* src it-code
+          tar cvJf "it-code.tar.xz" "it-code"
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
+        with:
+          files: "it-code.tar.xz"

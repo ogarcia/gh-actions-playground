@@ -20,3 +20,13 @@ jobs:
         with:
           name: it
           path: target/release/it
+      - name: Package tagged compilation
+        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
+        run: |
+          install -Dm755 "target/release/it" "it-static/it"
+          tar cvJf "it-static.tar.xz" "it-static"
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
+        with:
+          files: "it-static.tar.xz"
